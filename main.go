@@ -24,8 +24,6 @@ func main() {
 		log.Fatal("Failed to process environment variables: " + err.Error())
 	}
 
-	log.Println(config)
-
 	if config.Path == "" {
 		envconfig.Usagef(envconfigKey, &config, os.Stderr, envconfig.DefaultTableFormat)
 		log.Fatal("Failed to open image at path: " + config.Path +
@@ -38,7 +36,6 @@ func main() {
 		log.Fatal("Failed to open image at path: " + config.Path +
 			"; " + err.Error())
 	}
-
 
 	gif, err := gif.DecodeAll(img)
 	if err != nil {
