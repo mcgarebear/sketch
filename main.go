@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image/gif"
 	"log"
 	"os"
 
@@ -8,9 +9,10 @@ import (
 )
 
 type sketchConfig struct {
-	Color bool `envconfig:"color"`
-	Path string `enconfig:"path"`
-	Frame int `enconfig:"frame"`
+	Color  bool   `envconfig:"color"`
+	Path   string `enconfig:"path"`
+	Frame  int    `enconfig:"frame"`
+	Shader string `envconfig:"shader"`
 }
 
 func main() {
@@ -23,4 +25,25 @@ func main() {
 	}
 
 	log.Println(config)
+
+	if config.Path == "" {
+		envconfig.Usagef(envconfigKey, &config, os.Stderr, envconfig.DefaultTableFormat)
+		log.Fatal("Failed to open image at path: " + config.Path +
+			"; Path not provided.")
+	}
+
+	img, err := os.Open(config.Path)
+	if err != nil {
+		envconfig.Usagef(envconfigKey, &config, os.Stderr, envconfig.DefaultTableFormat)
+		log.Fatal("Failed to open image at path: " + config.Path +
+			"; " + err.Error())
+	}
+
+	_, err = gif.DecodeAll(img)
+	if err != nil {
+		envconfig.Usagef(envconfigKey, &config, os.Stderr, envconfig.DefaultTableFormat)
+		log.Fatal("Failed to open image at path: " + config.Path +
+			"; " + err.Error())
+	}
+
 }
