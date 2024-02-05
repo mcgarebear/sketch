@@ -39,11 +39,14 @@ func main() {
 			"; " + err.Error())
 	}
 
-	_, err = gif.DecodeAll(img)
+
+	gif, err := gif.DecodeAll(img)
 	if err != nil {
 		envconfig.Usagef(envconfigKey, &config, os.Stderr, envconfig.DefaultTableFormat)
 		log.Fatal("Failed to open image at path: " + config.Path +
 			"; " + err.Error())
 	}
+
+	log.Println(gif)
 
 }
