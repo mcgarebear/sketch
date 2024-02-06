@@ -43,7 +43,19 @@ func main() {
 		log.Fatal("Failed to open image at path: " + config.Path +
 			"; " + err.Error())
 	}
+	log.Println("gif", gif)
+	log.Println("gif.LoopCount", gif.LoopCount)
+	log.Println("gif.Config", gif.Config)
+	log.Println("gif.BackgroundIndex", gif.BackgroundIndex)
 
-	log.Println(gif)
+	numImages := len(gif.Image)
+	log.Println("numImages", numImages)
+
+	for idx := 0; idx < numImages; idx++ {
+		log.Println("idx", idx)
+		log.Println("gif.Image", gif.Image[idx])
+		log.Println("gif.Delay", gif.Delay[idx])
+		log.Println("gif.Disposal", gif.Disposal[idx])
+	}
 
 }
