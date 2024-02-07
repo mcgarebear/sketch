@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/gif"
 	"log"
 	"os"
@@ -68,9 +69,14 @@ func main() {
 				pixelIdx := (row-image.Rect.Min.Y)*image.Stride + (col - image.Rect.Min.X)
 				color := image.Palette[image.Pix[pixelIdx]]
 				log.Println("x", col, "y", row, "color", color)
+				r, g, b, _ := color.RGBA()
+				fmt.Printf("\x1b[38;5;%dmx", r+g+b%8)
 			}
+			fmt.Printf("\n")
 		}
 
+		break
 	}
+	fmt.Printf("\x1b[0m")
 
 }
