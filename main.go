@@ -5,6 +5,7 @@ import (
 	"image/gif"
 	"log"
 	"os"
+	"time"
 
 	"github.com/kelseyhightower/envconfig"
 )
@@ -60,10 +61,10 @@ func main() {
 		log.Println("gif.Delay", gif.Delay[idx])
 		log.Println("gif.Disposal", gif.Disposal[idx])
 
-		image := gif.Image[idx]
 		// iterate through each pixel in the image, starting from the top left
 		// and moving to the bottom right. For each pixel, index into the color
 		// pallette to determine the pixel's color value.
+		image := gif.Image[idx]
 		for row := 0; row < gif.Config.Height; row++ {
 			for col := 0; col < gif.Config.Width; col++ {
 				pixelIdx := (row-image.Rect.Min.Y)*image.Stride + (col - image.Rect.Min.X)
@@ -74,9 +75,8 @@ func main() {
 			}
 			fmt.Printf("\n")
 		}
-
-		break
+		fmt.Printf("\x1b[0m")
+		time.Sleep(time.Second / 100 * time.Duration(gif.Delay[idx]))
 	}
-	fmt.Printf("\x1b[0m")
 
 }
