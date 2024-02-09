@@ -75,8 +75,12 @@ func main() {
 			}
 			fmt.Printf("\n")
 		}
+		// clear color, reset cursor
 		fmt.Printf("\x1b[0m")
 		time.Sleep(time.Second / 100 * time.Duration(gif.Delay[idx]))
+		if idx < numImages {
+			fmt.Printf("\x1b[%dF", gif.Config.Height)
+		}
 	}
 
 }
