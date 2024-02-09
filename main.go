@@ -52,6 +52,10 @@ func main() {
 	log.Println("gif.Config", gif.Config)
 	log.Println("gif.BackgroundIndex", gif.BackgroundIndex)
 
+	// hide cursor, best effort to restore cursor
+	fmt.Printf("\x1b?25l")
+	defer fmt.Printf("\x1b?25h")
+
 	// for each image in the gif
 	numImages := len(gif.Image)
 	log.Println("numImages", numImages)
