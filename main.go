@@ -47,10 +47,6 @@ func main() {
 		log.Fatal("Failed to open image at path: " + config.Path +
 			"; " + err.Error())
 	}
-	log.Println("gif", gif)
-	log.Println("gif.LoopCount", gif.LoopCount)
-	log.Println("gif.Config", gif.Config)
-	log.Println("gif.BackgroundIndex", gif.BackgroundIndex)
 
 	// hide cursor, best effort to restore cursor
 	fmt.Printf("\x1b?25l")
@@ -58,13 +54,7 @@ func main() {
 
 	// for each image in the gif
 	numImages := len(gif.Image)
-	log.Println("numImages", numImages)
 	for idx := 0; idx < numImages; idx++ {
-		log.Println("idx", idx)
-		log.Println("gif.Image", gif.Image[idx])
-		log.Println("gif.Delay", gif.Delay[idx])
-		log.Println("gif.Disposal", gif.Disposal[idx])
-
 		// iterate through each pixel in the image, starting from the top left
 		// and moving to the bottom right. For each pixel, index into the color
 		// pallette to determine the pixel's color value.
@@ -73,9 +63,10 @@ func main() {
 			for col := 0; col < gif.Config.Width; col++ {
 				pixelIdx := (row-image.Rect.Min.Y)*image.Stride + (col - image.Rect.Min.X)
 				color := image.Palette[image.Pix[pixelIdx]]
-				log.Println("x", col, "y", row, "color", color)
-				r, g, b, _ := color.RGBA()
-				fmt.Printf("\x1b[38;5;%dmx", r+g+b%8)
+				red, green, blue, alpha := color.RGBA()
+				log.Println("x", col, "y", row, "color", color, "red", red, "green", green,
+					"blue", blue, "alpha", alpha)
+				fmt.Printf("\x1b[38;2;%d;%d;%dmx", r+g+b%8)
 			}
 			fmt.Printf("\n")
 		}
