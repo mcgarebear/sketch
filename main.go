@@ -61,15 +61,11 @@ func main() {
 		// and moving to the bottom right. For each pixel, index into the color
 		// pallette to determine the pixel's color value.
 		image := gif.Image[idx]
-		for row := 0; row < gif.Config.Height; row++ {
-			for col := 0; col < gif.Config.Width; col++ {
-				pixelIdx := (row-image.Rect.Min.Y)*image.Stride + (col - image.Rect.Min.X)
-				color := image.Palette[image.Pix[pixelIdx]]
-				red, green, blue, alpha := color.RGBA()
-
-				log.Printf("x %d y %d color %v red %x blue %x green %x alpha %x",
-					col, row, color, red&0xFF, blue&0xFF, green&0xFF, alpha&0xFF)
-
+		height := image.Bounds().Dy()
+		width := image.Bounds().Dx()
+		for row := 0; row < height; row++ {
+			for col := 0; col < width; col++ {
+				red, green, blue, alpha := image.At(col, row).RGBA()
 				if alpha > 0 {
 					fmt.Printf("\x1b[38;2;%d;%d;%dmx", red&0xFF, blue&0xFF, green&0xFF)
 				} else {
