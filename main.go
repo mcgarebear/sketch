@@ -5,6 +5,7 @@ import (
 	"image/gif"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -57,6 +58,7 @@ func main() {
 	numImages := len(gif.Image)
 	prevHeight := 0
 	for idx := 0; idx < numImages; idx++ {
+		var imageRasterized strings.Builder
 		// iterate through each pixel in the image, starting from the top left
 		// and moving to the bottom right. For each pixel, index into the color
 		// pallette to determine the pixel's color value.
@@ -67,29 +69,31 @@ func main() {
 			for col := 0; col < width; col++ {
 				red, green, blue, alpha := image.At(col, row).RGBA()
 				if alpha > 0 {
-					fmt.Printf("\x1b[38;2;%d;%d;%dmx", red&0xFF, blue&0xFF, green&0xFF)
+					fmt.Fprintf(&imageRasterized, "\x1b[38;2;%d;%d;%dmx",
+						red&0xFF, blue&0xFF, green&0xFF)
 				} else {
-					fmt.Printf("\x1b[0m ")
+					fmt.Fprintf(&imageRasterized, "\x1b[0m ")
 				}
 
 			}
 			// handle gifs with varying sized frames: clear from cursor
 			// to EOL. newline for next row.
-			fmt.Printf("\x1b[0J")
-			fmt.Printf("\n")
+			fmt.Fprintf(&imageRasterized, "\x1b[0J")
+			fmt.Fprintf(&imageRasterized, "\n")
 		}
 		// handle gifs with varying sized frames: clear any additional rows from
 		// the previous frame by clearing the line
 		for deltaHeight := prevHeight - height; deltaHeight > 0; deltaHeight-- {
-			fmt.Printf("\x1b[2K\n")
+			fmt.Fprintf(&imageRasterized, "\x1b[2K\n")
 		}
 		// move cursor back to original position
 		if (idx + 1) != numImages {
-			fmt.Printf("\x1b[1;1H")
+			fmt.Fprintf(&imageRasterized, "\x1b[1;1H")
 		}
 		prevHeight = height
 		// by deleting the line
 		// sleep for animation
+		fmt.Printf(imageRasterized.String())
 		time.Sleep((time.Second / 100) * time.Duration(gif.Delay[idx]))
 	}
 
