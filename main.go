@@ -76,23 +76,22 @@ func main() {
 				}
 
 			}
-			// handle gifs with varying sized frames: clear from cursor
-			// to EOL. newline for next row.
+			// handle gifs with varying sized frames:
+			//   clear from cursor to EOL. newline for next row.
 			fmt.Fprintf(&imageRasterized, "\x1b[0J")
 			fmt.Fprintf(&imageRasterized, "\n")
 		}
-		// handle gifs with varying sized frames: clear any additional rows from
-		// the previous frame by clearing the line
+		// handle gifs with varying sized frames:
+		//   clear any additional rows from the previous frame by clearing the line
 		for deltaHeight := prevHeight - height; deltaHeight > 0; deltaHeight-- {
 			fmt.Fprintf(&imageRasterized, "\x1b[2K\n")
 		}
-		// move cursor back to original position
+		// move cursor back to original position (except for last frame)
 		if (idx + 1) != numImages {
 			fmt.Fprintf(&imageRasterized, "\x1b[1;1H")
 		}
 		prevHeight = height
-		// by deleting the line
-		// sleep for animation
+		// draw, then sleep for animation
 		fmt.Printf(imageRasterized.String())
 		time.Sleep((time.Second / 100) * time.Duration(gif.Delay[idx]))
 	}
