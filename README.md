@@ -4,10 +4,16 @@ Renders gifs in the terminal.
 
 ## Install
 
-Install using `go`:
+```bash
+go install github.com/mcgarebear/sketch@latest
+```
+
+or
 
 ```bash
-go install github.com/mcgarebear/sketch
+git clone git@github.com:mcgarebear/sketch.git
+cd sketch
+go install
 ```
 
 ## Other
