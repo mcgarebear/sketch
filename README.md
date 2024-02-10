@@ -1,8 +1,20 @@
 # sketch
 
-Clone pokemon gifs and sprites from
+Renders gifs in the terminal.
+
+## Install
+
+Install using `go`:
+
+```bash
+go install github.com/mcgarebear/sketch
+```
+
+## Other
+
+Clone pokemon sprites from
 [PokeAPI/sprites](https://github.com/PokeAPI/sprites)
-for some cool pokemon sprites to render.
+for some dope pokemon sprites.
 
 ```
 git clone git@github.com/PokeAPI/sprites
