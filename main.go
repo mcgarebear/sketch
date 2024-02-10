@@ -48,15 +48,15 @@ func main() {
 			"; " + err.Error())
 	}
 
-	// hide cursor, best effort to restore cursor
+	// hide cursor, best effort to restore prompt
 	fmt.Printf("\x1b?25l")
 	defer fmt.Printf("\x1b?25h")
 	defer fmt.Printf("\x1b[0m")
 
 	// for each image in the gif
 	numImages := len(gif.Image)
+	prevHeight := 0
 	for idx := 0; idx < numImages; idx++ {
-
 		// iterate through each pixel in the image, starting from the top left
 		// and moving to the bottom right. For each pixel, index into the color
 		// pallette to determine the pixel's color value.
@@ -73,8 +73,23 @@ func main() {
 				}
 
 			}
+			// handle gifs with varying sized frames: clear from cursor
+			// to EOL. newline for next row.
+			fmt.Printf("\x1b[0J")
 			fmt.Printf("\n")
 		}
+		// handle gifs with varying sized frames: clear any additional rows from
+		// the previous frame by clearing the line
+		for deltaHeight := prevHeight - height; deltaHeight > 0; deltaHeight-- {
+			fmt.Printf("\x1b[2K\n")
+		}
+		// move cursor back to original position
+		if (idx + 1) != numImages {
+			fmt.Printf("\x1b[1;1H")
+		}
+		prevHeight = height
+		// by deleting the line
+		// sleep for animation
 		time.Sleep((time.Second / 100) * time.Duration(gif.Delay[idx]))
 	}
 
