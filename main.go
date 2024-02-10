@@ -13,9 +13,7 @@ import (
 )
 
 type sketchConfig struct {
-	Color  bool   `envconfig:"color"`
 	Path   string `enconfig:"path"`
-	Frame  int    `enconfig:"frame"`
 	Shader string `envconfig:"shader"`
 }
 
