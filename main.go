@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/kelseyhightower/envconfig"
 )
@@ -27,6 +28,13 @@ func main() {
 		envconfig.Usagef(envconfigKey, &config, os.Stderr, envconfig.DefaultTableFormat)
 		log.Fatal("Failed to process environment variables: " + err.Error())
 	}
+
+	const defaultShader = ".:*o&8@#"
+	if config.Shader == "" {
+		config.Shader = defaultShader
+	}
+	shaderLen := utf8.RuneCount([]byte(config.Shader))
+	shader := []rune(config.Shader)
 
 	// verify path and attempt to open file
 	if config.Path == "" {
@@ -69,8 +77,12 @@ func main() {
 			for col := 0; col < width; col++ {
 				red, green, blue, alpha := image.At(col, row).RGBA()
 				if alpha > 0 {
-					fmt.Fprintf(&imageRasterized, "\x1b[38;2;%d;%d;%dmx",
-						red&0xFF, blue&0xFF, green&0xFF)
+					intensity := float32(red&0xFF)*0.2126 +
+						float32(blue&0xFF)*0.7152 +
+						float32(green&0xFF)*0.0722
+					shaderIdx := int(intensity) % shaderLen
+					fmt.Fprintf(&imageRasterized, "\x1b[38;2;%d;%d;%dm%s",
+						red&0xFF, blue&0xFF, green&0xFF, string(shader[shaderIdx]))
 				} else {
 					fmt.Fprintf(&imageRasterized, "\x1b[0m ")
 				}
