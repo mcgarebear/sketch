@@ -51,10 +51,12 @@ func main() {
 	// hide cursor, best effort to restore cursor
 	fmt.Printf("\x1b?25l")
 	defer fmt.Printf("\x1b?25h")
+	defer fmt.Printf("\x1b[0m")
 
 	// for each image in the gif
 	numImages := len(gif.Image)
 	for idx := 0; idx < numImages; idx++ {
+
 		// iterate through each pixel in the image, starting from the top left
 		// and moving to the bottom right. For each pixel, index into the color
 		// pallette to determine the pixel's color value.
@@ -64,18 +66,20 @@ func main() {
 				pixelIdx := (row-image.Rect.Min.Y)*image.Stride + (col - image.Rect.Min.X)
 				color := image.Palette[image.Pix[pixelIdx]]
 				red, green, blue, alpha := color.RGBA()
-				log.Println("x", col, "y", row, "color", color, "red", red, "green", green,
-					"blue", blue, "alpha", alpha)
-				fmt.Printf("\x1b[38;2;%d;%d;%dmx", r+g+b%8)
+
+				log.Printf("x %d y %d color %v red %x blue %x green %x alpha %x",
+					col, row, color, red&0xFF, blue&0xFF, green&0xFF, alpha&0xFF)
+
+				if alpha > 0 {
+					fmt.Printf("\x1b[38;2;%d;%d;%dmx", red&0xFF, blue&0xFF, green&0xFF)
+				} else {
+					fmt.Printf("\x1b[0m ")
+				}
+
 			}
 			fmt.Printf("\n")
 		}
-		// clear color, reset cursor
-		fmt.Printf("\x1b[0m")
-		time.Sleep(time.Second / 100 * time.Duration(gif.Delay[idx]))
-		if idx < numImages {
-			fmt.Printf("\x1b[%dF", gif.Config.Height)
-		}
+		time.Sleep((time.Second / 100) * time.Duration(gif.Delay[idx]))
 	}
 
 }
