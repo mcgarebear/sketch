@@ -18,7 +18,6 @@ type sketchConfig struct {
 }
 
 func main() {
-
 	// parse configuration from environment
 	const envconfigKey = "SKETCH"
 	var config sketchConfig
@@ -105,5 +104,4 @@ func main() {
 		fmt.Printf(imageRasterized.String())
 		time.Sleep((time.Second / 100) * time.Duration(gif.Delay[idx]))
 	}
-
 }
