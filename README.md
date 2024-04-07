@@ -5,7 +5,16 @@
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/mcgarebear/sketch)](https://pkg.go.dev/github.com/mcgarebear/sketch)
 [![Release](https://img.shields.io/github/release/mcgarebear/sketch.svg?style=flat-square)](https://github.com/mcgarebear/sketch/releases/latest)
 
-Renders gifs in the terminal.
+A cool, little program that can play gifs in the terminal. Yes, it supports
+fancy colors too. Shading is based on the color intensity of the color pixel
+and can be configured by setting `SKETCH_SHADER` during invocation. This must
+be a string of characters representing the gradient white to black.
+
+## Usage
+
+```bash
+SKETCH_PATH='/path/to/a/gif' sketch
+```
 
 ## Install
 
