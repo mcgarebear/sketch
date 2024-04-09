@@ -9,49 +9,63 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/mcgarebear/sketch/cmd"
+
 	"github.com/kelseyhightower/envconfig"
 )
 
-type sketchConfig struct {
-	Path   string `enconfig:"path"`
-	Shader string `envconfig:"shader"`
-}
+// Environment variable prefix for parsing application configuration
+// data
+const envconfigKey = "SKETCH"
 
-func main() {
-	// parse configuration from environment
-	const envconfigKey = "SKETCH"
-	var config sketchConfig
+// parseEnv returns the parsed structure.
+func parseEnv() (*cmd.SketchConfig, error) {
+	var config cmd.SketchConfig
 	if err := envconfig.Process(envconfigKey, &config); err != nil {
-		envconfig.Usagef(envconfigKey, &config, os.Stderr, envconfig.DefaultTableFormat)
-		log.Fatal("Failed to process environment variables: " + err.Error())
+		return nil, err
 	}
 
 	const defaultShader = ".:*o&8@#"
 	if config.Shader == "" {
 		config.Shader = defaultShader
 	}
-	shaderLen := utf8.RuneCount([]byte(config.Shader))
-	shader := []rune(config.Shader)
+	config.Shader = config.Shader
 
-	// verify path and attempt to open file
 	if config.Path == "" {
-		envconfig.Usagef(envconfigKey, &config, os.Stderr, envconfig.DefaultTableFormat)
-		log.Fatal("Failed to open image at path: " + config.Path +
-			"; Path not provided.")
+		return nil, fmt.Errorf("Environment variable `PATH` not provided.")
 	}
+
+	return &config, nil
+}
+
+// parseGif returns the concrete gif implementation, given a runtime configuration.
+func parseGif(config *cmd.SketchConfig) (*gif.GIF, error) {
 	img, err := os.Open(config.Path)
 	if err != nil {
-		envconfig.Usagef(envconfigKey, &config, os.Stderr, envconfig.DefaultTableFormat)
-		log.Fatal("Failed to open image at path: " + config.Path +
-			"; " + err.Error())
+		return nil, err
 	}
 
-	// decode open file into gif
 	gif, err := gif.DecodeAll(img)
 	if err != nil {
 		envconfig.Usagef(envconfigKey, &config, os.Stderr, envconfig.DefaultTableFormat)
 		log.Fatal("Failed to open image at path: " + config.Path +
 			"; " + err.Error())
+	}
+	return gif, nil
+}
+
+func main() {
+	config, err := parseEnv()
+	if err != nil {
+		envconfig.Usagef(envconfigKey, &config, os.Stderr, envconfig.DefaultTableFormat)
+		log.Fatal("Failed to parse environment. " + err.Error())
+	}
+	shaderLen := utf8.RuneCount([]byte(config.Shader))
+
+	gif, err := parseGif(config)
+	if err != nil {
+		envconfig.Usagef(envconfigKey, &config, os.Stderr, envconfig.DefaultTableFormat)
+		log.Fatal("Failed to parse image. " + err.Error())
 	}
 
 	// hide cursor, best effort to restore prompt
@@ -79,7 +93,7 @@ func main() {
 						float32(green&0xFF)*0.0722
 					shaderIdx := int(intensity) % shaderLen
 					fmt.Fprintf(&imageRasterized, "\x1b[38;2;%d;%d;%dm%s",
-						red&0xFF, blue&0xFF, green&0xFF, string(shader[shaderIdx]))
+						red&0xFF, blue&0xFF, green&0xFF, string(config.Shader[shaderIdx]))
 				} else {
 					fmt.Fprintf(&imageRasterized, "\x1b[0m ")
 				}
